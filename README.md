@@ -1,5 +1,6 @@
 # Agent CLI Tools Docker Environment
 
+[![Build and Push](https://github.com/markoria/agent-cli-tools/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/markoria/agent-cli-tools/actions/workflows/docker-publish.yml)
 [![Docker Hub](https://img.shields.io/badge/Docker%20Hub-markoria%2Fagent--cli--tools-blue?logo=docker)](https://hub.docker.com/r/markoria/agent-cli-tools)
 [![Docker Image Size](https://img.shields.io/docker/image-size/markoria/agent-cli-tools/latest?logo=docker)](https://hub.docker.com/r/markoria/agent-cli-tools/tags)
 [![Docker Pulls](https://img.shields.io/docker/pulls/markoria/agent-cli-tools?logo=docker)](https://hub.docker.com/r/markoria/agent-cli-tools)
