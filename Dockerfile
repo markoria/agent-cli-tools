@@ -1,5 +1,14 @@
 # Dockerfile for Agent CLI Tools
-# Base image with Node.js 22 (required for GitHub Copilot CLI)
+# Multi-stage build: Stage 1 - Build webhook server
+FROM golang:1.23-bookworm AS webhook-builder
+
+WORKDIR /build
+COPY webhook-server.go .
+
+# Build static binary for webhook server
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o webhook-server webhook-server.go
+
+# Stage 2 - Runtime image with Node.js 22 (required for GitHub Copilot CLI)
 FROM node:22-bookworm
 
 # Install Base Utilities & SSH Server
@@ -41,12 +50,16 @@ ENV PATH=$PATH:/home/agent/.local/bin
 COPY .bashrc /home/agent/.bashrc
 RUN chown agent:agent /home/agent/.bashrc
 
+# Copy webhook server binary from builder stage
+COPY --from=webhook-builder /build/webhook-server /usr/local/bin/webhook-server
+RUN chmod +x /usr/local/bin/webhook-server
+
 # Copy entrypoint script
 COPY entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 WORKDIR /home/agent
-EXPOSE 22
+EXPOSE 22 8080
 
 ENTRYPOINT ["entrypoint.sh"]
 CMD ["/usr/sbin/sshd", "-D"]

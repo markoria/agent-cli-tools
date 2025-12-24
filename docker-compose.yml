@@ -16,6 +16,7 @@ services:
     
     ports:
       - "2222:22"  # SSH access
+      - "8080:8080"  # Webhook HTTP server
     
     environment:
       # ===== AGENT TOOLS =====
@@ -27,6 +28,13 @@ services:
       
       # Check for updates on startup (true/false)
       - CHECK_UPDATES=false
+      
+      # ===== WEBHOOK SERVER =====
+      # Secret token for webhook authentication (REQUIRED if using webhooks)
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET:-}
+      
+      # Webhook server port (default: 8080)
+      - WEBHOOK_PORT=8080
       
       # ===== HEADLESS MCP SERVERS =====
       # Format: MCP_{NAME}_URL=http://{service-name}:{port}/sse

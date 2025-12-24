@@ -192,6 +192,35 @@ echo "SSH Access:"
 echo "   ssh agent@localhost -p 2222"
 echo "   (SSH key required - mount your public key to /home/agent/.ssh/authorized_keys)"
 echo ""
+
+# ===========================================
+# 4. START WEBHOOK SERVER
+# ===========================================
+if [ ! -z "$WEBHOOK_SECRET" ]; then
+    echo "Starting Webhook Server..."
+    echo "---------------------------------------------------"
+    echo "✅ Webhook endpoints available on port ${WEBHOOK_PORT:-8080}"
+    echo "   POST /webhook/copilot"
+    echo "   POST /webhook/claude"
+    echo "   POST /webhook/gemini"
+    echo "   GET  /health"
+    echo ""
+    
+    # Start webhook server in background as agent user
+    sudo -u agent \
+        WEBHOOK_SECRET="$WEBHOOK_SECRET" \
+        WEBHOOK_PORT="${WEBHOOK_PORT:-8080}" \
+        PATH="/home/agent/.npm-global/bin:/home/agent/.local/bin:$PATH" \
+        /usr/local/bin/webhook-server > /var/log/webhook-server.log 2>&1 &
+    
+    WEBHOOK_PID=$!
+    echo "Webhook server started (PID: $WEBHOOK_PID)"
+    echo "Logs: /var/log/webhook-server.log"
+else
+    echo "⚠️  Webhook Server: Disabled (WEBHOOK_SECRET not set)"
+fi
+
+echo ""
 echo "==================================================="
 
 # Start SSH Daemon (the main process)
