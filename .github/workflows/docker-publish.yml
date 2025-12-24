@@ -18,6 +18,8 @@ jobs:
   auto-tag:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !startsWith(github.event.head_commit.message, 'Bump version')
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     outputs:
       new_tag: ${{ steps.tag_version.outputs.new_tag }}
     
@@ -26,6 +28,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Get latest tag and create new patch version
         id: tag_version
