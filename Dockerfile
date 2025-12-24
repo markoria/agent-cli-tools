@@ -37,6 +37,10 @@ RUN mkdir -p /home/agent/.npm-global \
 # Add Python user bin to PATH (for pip install --user)
 ENV PATH=$PATH:/home/agent/.local/bin
 
+# Copy bashrc for agent user (ensures PATH is set on SSH login)
+COPY .bashrc /home/agent/.bashrc
+RUN chown agent:agent /home/agent/.bashrc
+
 # Copy entrypoint script
 COPY entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh
