@@ -8,6 +8,25 @@ echo "==================================================="
 # Fix permissions for home directory (in case volume ownership is wrong)
 chown -R agent:agent /home/agent 2>/dev/null || true
 
+# Copy .bashrc if it doesn't exist (for fresh volume mounts)
+if [ ! -f "/home/agent/.bashrc" ]; then
+    if [ -f "/etc/skel/.bashrc" ]; then
+        cp /etc/skel/.bashrc /home/agent/.bashrc
+    fi
+    # Ensure PATH is set for npm global and python user packages
+    cat >> /home/agent/.bashrc << 'EOF'
+
+# Add NPM global packages to PATH
+export NPM_CONFIG_PREFIX=/home/agent/.npm-global
+export PATH=$PATH:/home/agent/.npm-global/bin
+
+# Add Python user packages to PATH
+export PATH=$PATH:/home/agent/.local/bin
+EOF
+    chown agent:agent /home/agent/.bashrc
+    echo "✅ Created .bashrc for agent user"
+fi
+
 # ===========================================
 # 1. DYNAMIC TOOL INSTALLATION
 # ===========================================
