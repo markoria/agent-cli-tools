@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  # ========================================
+  # Main Agent CLI Container
+  # ========================================
+  agent-cli:
+    build: .
+    container_name: agent-cli
+    hostname: agent-cli
+    
+    ports:
+      - "2222:22"  # SSH access
+    
+    environment:
+      # ===== AGENT TOOLS =====
+      # NPM packages to install (space-separated)
+      - INSTALL_PACKAGES=@github/copilot @anthropic-ai/claude-code @google/gemini-cli
+      
+      # Python packages to install (space-separated)
+      # - INSTALL_PIP_PACKAGES=
+      
+      # Check for updates on startup (true/false)
+      - CHECK_UPDATES=false
+      
+      # ===== HEADLESS MCP SERVERS =====
+      # Format: MCP_{NAME}_URL=http://{service-name}:{port}/sse
+      # Uncomment to enable example MCP servers
+      # - MCP_FILESYSTEM_URL=http://mcp-filesystem:8000/sse
+      # - MCP_DATABASE_URL=http://mcp-database:8000/sse
+      
+      # ===== API KEYS =====
+      # Anthropic API Key (for Claude)
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      
+      # GitHub Token (alternative to gh auth login)
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+      
+      # Google API Key (for Gemini)
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+    
+    volumes:
+      # Persist user data, installed packages, and authentication
+      - agent_data:/home/agent
+      
+      # Optional: Mount your SSH public key for passwordless access
+      # Set SSH_PUBLIC_KEY_PATH in .env file (e.g., ~/.ssh/id_rsa.pub)
+      # - ${SSH_PUBLIC_KEY_PATH}:/home/agent/.ssh/authorized_keys:ro
+      
+      # Optional: Mount a custom MCP config file
+      # - ./mcp-config.json:/home/agent/.config/github-copilot/mcp-config.json:ro
+    
+    networks:
+      - agent-network
+    
+    restart: unless-stopped
+
+  # ========================================
+  # Example: Headless MCP Filesystem Server
+  # ========================================
+  # Uncomment to enable a filesystem MCP server
+  # mcp-filesystem:
+  #   image: modelcontextprotocol/server-filesystem:latest
+  #   container_name: mcp-filesystem
+  #   command: ["--allow-read", "/data", "--allow-write", "/data"]
+  #   volumes:
+  #     - ./shared-data:/data
+  #   networks:
+  #     - agent-network
+  #   restart: unless-stopped
+
+  # ========================================
+  # Example: Headless MCP Database Server
+  # ========================================
+  # mcp-database:
+  #   image: modelcontextprotocol/server-postgres:latest
+  #   container_name: mcp-database
+  #   environment:
+  #     - DATABASE_URL=postgresql://user:pass@postgres:5432/mydb
+  #   networks:
+  #     - agent-network
+  #   depends_on:
+  #     - postgres
+  #   restart: unless-stopped
+
+  # postgres:
+  #   image: postgres:16
+  #   environment:
+  #     - POSTGRES_USER=user
+  #     - POSTGRES_PASSWORD=pass
+  #     - POSTGRES_DB=mydb
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - agent-network
+
+volumes:
+  agent_data:
+    name: agent_data
+  # postgres_data:
+
+networks:
+  agent-network:
+    driver: bridge
