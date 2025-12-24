@@ -1,9 +1,9 @@
 # Agent CLI Tools Docker Environment
 
-[![Docker Hub](https://img.shields.io/docker/v/markoria/agent-cli-tools?label=Docker%20Hub&logo=docker)](https://hub.docker.com/r/markoria/agent-cli-tools)
-[![Docker Image Size](https://img.shields.io/docker/image-size/markoria/agent-cli-tools/latest)](https://hub.docker.com/r/markoria/agent-cli-tools)
-[![Docker Pulls](https://img.shields.io/docker/pulls/markoria/agent-cli-tools)](https://hub.docker.com/r/markoria/agent-cli-tools)
-[![GitHub](https://img.shields.io/github/license/markoria/agent-cli-tools)](https://github.com/markoria/agent-cli-tools)
+[![Docker Hub](https://img.shields.io/badge/Docker%20Hub-markoria%2Fagent--cli--tools-blue?logo=docker)](https://hub.docker.com/r/markoria/agent-cli-tools)
+[![Docker Image Size](https://img.shields.io/docker/image-size/markoria/agent-cli-tools/latest?logo=docker)](https://hub.docker.com/r/markoria/agent-cli-tools/tags)
+[![Docker Pulls](https://img.shields.io/docker/pulls/markoria/agent-cli-tools?logo=docker)](https://hub.docker.com/r/markoria/agent-cli-tools)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A modular, persistent Docker environment for running AI agent CLI tools (GitHub Copilot CLI, Claude Code, Gemini) with SSH access and headless Model Context Protocol (MCP) server support.
 
