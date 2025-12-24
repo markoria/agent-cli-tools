@@ -16,19 +16,23 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | d
     && apt-get update && apt-get install -y gh \
     && rm -rf /var/lib/apt/lists/*
 
-# Configure SSH
+# Configure SSH (key-only authentication)
 RUN mkdir /var/run/sshd
-RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config \
-    && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config
+RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config \
+    && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config \
+    && sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
 
-# Create 'agent' user with sudo privileges
+# Create 'agent' user with sudo privileges (no password - SSH key only)
 RUN useradd -m -s /bin/bash agent \
-    && echo 'agent ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
-    && echo 'agent:agent' | chpasswd
+    && echo 'agent ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 # Configure NPM to install packages to /home/agent/.npm-global (Persisted in volume!)
 ENV NPM_CONFIG_PREFIX=/home/agent/.npm-global
 ENV PATH=$PATH:/home/agent/.npm-global/bin
+
+# Create npm-global directory with correct permissions
+RUN mkdir -p /home/agent/.npm-global \
+    && chown -R agent:agent /home/agent/.npm-global
 
 # Add Python user bin to PATH (for pip install --user)
 ENV PATH=$PATH:/home/agent/.local/bin

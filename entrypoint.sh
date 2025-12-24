@@ -21,9 +21,9 @@ if [ ! -z "$INSTALL_PACKAGES" ]; then
         # Skip if it looks like a pip package (contains / or starts with common pip patterns)
         if [[ "$pkg" == *"/"* ]] || [[ "$pkg" == @* ]] || [[ "$pkg" == *"-cli" ]]; then
             # This looks like an npm package
-            if ! sudo -u agent npm list -g "$pkg" > /dev/null 2>&1; then
+            if ! sudo -u agent NPM_CONFIG_PREFIX=/home/agent/.npm-global npm list -g "$pkg" > /dev/null 2>&1; then
                 echo "📦 Installing NPM package: $pkg..."
-                sudo -u agent npm install -g "$pkg" --loglevel=error
+                sudo -u agent NPM_CONFIG_PREFIX=/home/agent/.npm-global npm install -g "$pkg" --loglevel=error
             else
                 echo "✅ NPM package already installed: $pkg"
             fi
@@ -54,7 +54,7 @@ if [ "$CHECK_UPDATES" = "true" ]; then
     echo ""
     echo "Checking for package updates..."
     echo "---------------------------------------------------"
-    sudo -u agent npm update -g 2>/dev/null || true
+    sudo -u agent NPM_CONFIG_PREFIX=/home/agent/.npm-global npm update -g 2>/dev/null || true
     sudo -u agent pip3 install --user --upgrade pip 2>/dev/null || true
 fi
 
@@ -171,7 +171,7 @@ fi
 echo ""
 echo "SSH Access:"
 echo "   ssh agent@localhost -p 2222"
-echo "   Password: agent"
+echo "   (SSH key required - mount your public key to /home/agent/.ssh/authorized_keys)"
 echo ""
 echo "==================================================="
 
