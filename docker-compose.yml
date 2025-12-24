@@ -5,7 +5,12 @@ services:
   # Main Agent CLI Container
   # ========================================
   agent-cli:
-    build: .
+    # Use pre-built image from Docker Hub (recommended)
+    image: markoria/agent-cli-tools:latest
+    
+    # OR build from source (comment out 'image' above and uncomment 'build' below)
+    # build: .
+    
     container_name: agent-cli
     hostname: agent-cli
     

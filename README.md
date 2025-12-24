@@ -1,5 +1,10 @@
 # Agent CLI Tools Docker Environment
 
+[![Docker Hub](https://img.shields.io/docker/v/markoria/agent-cli-tools?label=Docker%20Hub&logo=docker)](https://hub.docker.com/r/markoria/agent-cli-tools)
+[![Docker Image Size](https://img.shields.io/docker/image-size/markoria/agent-cli-tools/latest)](https://hub.docker.com/r/markoria/agent-cli-tools)
+[![Docker Pulls](https://img.shields.io/docker/pulls/markoria/agent-cli-tools)](https://hub.docker.com/r/markoria/agent-cli-tools)
+[![GitHub](https://img.shields.io/github/license/markoria/agent-cli-tools)](https://github.com/markoria/agent-cli-tools)
+
 A modular, persistent Docker environment for running AI agent CLI tools (GitHub Copilot CLI, Claude Code, Gemini) with SSH access and headless Model Context Protocol (MCP) server support.
 
 ## Features
@@ -13,11 +18,30 @@ A modular, persistent Docker environment for running AI agent CLI tools (GitHub 
 
 ## Quick Start
 
-### 1. Build and Start the Container
+### Option A: Use Pre-built Image from Docker Hub (Recommended)
 
-```bash
-docker-compose up -d --build
-```
+1. Create a `docker-compose.yml` file:
+   ```bash
+   curl -O https://raw.githubusercontent.com/markoria/agent-cli-tools/main/docker-compose.yml
+   ```
+
+2. Start the container:
+   ```bash
+   docker-compose up -d
+   ```
+
+### Option B: Build from Source
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/markoria/agent-cli-tools.git
+   cd agent-cli-tools
+   ```
+
+2. Build and start:
+   ```bash
+   docker-compose up -d --build
+   ```
 
 ### 2. (Optional) Setup SSH Key Authentication
 
@@ -105,6 +129,27 @@ claude
 
 # Gemini CLI
 gemini
+```
+
+## Installation
+
+### Pull from Docker Hub
+
+```bash
+docker pull markoria/agent-cli-tools:latest
+```
+
+### Run with Docker CLI
+
+If you prefer using `docker run` instead of `docker-compose`:
+
+```bash
+docker run -d \
+  --name agent-cli \
+  -p 2222:22 \
+  -e INSTALL_PACKAGES="@github/copilot @anthropic-ai/claude-code @google/gemini-cli" \
+  -v agent_data:/home/agent \
+  markoria/agent-cli-tools:latest
 ```
 
 ## Configuration
