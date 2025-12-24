@@ -21,41 +21,40 @@ jobs:
     permissions:
       contents: write
     outputs:
-      new_tag: ${{ steps.tag_version.outputs.new_tag }}
+      new_version: ${{ steps.version.outputs.new_version }}
+      major: ${{ steps.version.outputs.major }}
+      minor: ${{ steps.version.outputs.minor }}
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Get latest tag and create new patch version
-        id: tag_version
+
+      - name: Calculate new version
+        id: version
         run: |
-          # Get the latest tag, default to v1.0.0 if none exists
           LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-          echo "Latest tag: $LATEST_TAG"
-          
-          # Remove 'v' prefix and split into array
           VERSION=${LATEST_TAG#v}
           IFS='.' read -r -a VERSION_PARTS <<< "$VERSION"
           
-          # Increment patch version
           MAJOR=${VERSION_PARTS[0]}
           MINOR=${VERSION_PARTS[1]}
           PATCH=$((VERSION_PARTS[2] + 1))
           
           NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
-          echo "New tag: $NEW_TAG"
-          echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
+          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "major=$MAJOR" >> $GITHUB_OUTPUT
+          echo "minor=$MINOR" >> $GITHUB_OUTPUT
       
       - name: Create and push tag
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag ${{ steps.tag_version.outputs.new_tag }}
-          git push origin ${{ steps.tag_version.outputs.new_tag }}
+          git tag v${{ steps.version.outputs.new_version }}
+          git push origin v${{ steps.version.outputs.new_version }}
 
   build-and-push:
     needs: [auto-tag]
@@ -84,6 +83,9 @@ jobs:
           tags: |
             type=ref,event=branch
             type=ref,event=pr
+            type=raw,value=${{ needs.auto-tag.outputs.new_version }},enable=${{ needs.auto-tag.outputs.new_version != '' }}
+            type=raw,value=${{ needs.auto-tag.outputs.major }}.${{ needs.auto-tag.outputs.minor }},enable=${{ needs.auto-tag.outputs.new_version != '' }}
+            type=raw,value=${{ needs.auto-tag.outputs.major }},enable=${{ needs.auto-tag.outputs.new_version != '' }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
